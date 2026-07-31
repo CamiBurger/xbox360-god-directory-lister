@@ -1,0 +1,11 @@
+# Rust build artifacts
+/src-tauri/target/
+
+# Tauri-generated
+/src-tauri/gen/schemas/
+
+# OS
+.DS_Store
+
+# Local tooling config
+.claude/

@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GODLister</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- Setup view: first-run welcome + default options -->
+  <section id="setup-view" class="view">
+    <h1 id="setup-title">Listing Settings</h1>
+    <p id="setup-intro" class="hint">Set your default options below.</p>
+
+    <label class="field">
+      <span>Depth</span>
+      <input id="depth-count" type="number" min="-1" step="1" />
+      <span class="hint">0 = just the selected folder's own name. 1 = files and folders directly inside it. Higher = that many levels deep. -1 = no limit, scan everything.</span>
+    </label>
+
+    <fieldset class="field">
+      <legend>Xbox 360 GOD recognition</legend>
+      <label class="radio">
+        <input type="checkbox" id="god-recognition" />
+        Recognize GOD game folders (an 8-character Title ID name) and label them with the game's name
+      </label>
+      <span class="hint">Uses a bundled Title ID lookup table. IDs not in the table are left as their raw folder name.</span>
+
+      <label class="radio indent">
+        <input type="checkbox" id="content-type-recognition" />
+        Also label content-type folders inside a detected game folder (DLC, Title Updates, Arcade, etc.)
+      </label>
+      <span class="hint">Uses a fixed, offline table of known STFS content-type codes. Individual DLC files inside a DLC folder are also labeled with their DLC name, using a bundled catalog lookup.</span>
+    </fieldset>
+
+    <fieldset class="field">
+      <legend>Ask for these options</legend>
+      <label class="radio">
+        <input type="radio" name="freq" id="freq-every-time" />
+        Every time I run this program
+      </label>
+      <label class="radio">
+        <input type="radio" name="freq" id="freq-once" checked />
+        Just once — use these defaults from now on
+      </label>
+    </fieldset>
+
+    <div class="actions">
+      <button id="setup-cancel" class="secondary" hidden>Cancel</button>
+      <button id="setup-save" class="primary">Save</button>
+    </div>
+  </section>
+
+  <!-- Main view: pick folder, pick output, generate -->
+  <section id="main-view" class="view">
+    <header class="topbar">
+      <h1>GODLister</h1>
+      <button id="open-settings" class="icon-button" title="Settings" aria-label="Settings">⚙</button>
+    </header>
+
+    <div class="field">
+      <button id="pick-root" class="secondary full">Choose Folder to Scan…</button>
+      <span id="root-summary" class="hint">No folder selected</span>
+    </div>
+
+    <div class="field" id="output-field">
+      <button id="pick-output" class="secondary full">Choose Where to Save…</button>
+      <span id="output-summary" class="hint">No save location selected</span>
+    </div>
+
+    <label class="radio">
+      <input type="checkbox" id="preview-mode" />
+      Just show me the result instead of saving to a file
+    </label>
+
+    <div class="actions">
+      <button id="generate-btn" class="primary full" disabled>Generate List</button>
+    </div>
+
+    <div id="result-area" class="hint" hidden></div>
+  </section>
+
+  <!-- Preview popup: shown instead of writing a file when preview mode is on -->
+  <div id="preview-overlay" class="overlay" hidden>
+    <div id="preview-modal">
+      <header class="topbar">
+        <h1>Listing Preview</h1>
+      </header>
+      <p id="preview-counts" class="hint"></p>
+      <pre id="preview-text"></pre>
+      <div class="actions">
+        <button id="preview-close" class="secondary">Close (discard)</button>
+        <button id="preview-save" class="primary">Save As…</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
