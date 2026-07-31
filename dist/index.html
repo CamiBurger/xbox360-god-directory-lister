@@ -46,6 +46,16 @@
       </label>
     </fieldset>
 
+    <fieldset class="field">
+      <legend>Full Disk Access</legend>
+      <p id="fda-granted-msg" class="hint success" hidden>✓ Full Disk Access is enabled — GODLister can read protected system folders on any drive.</p>
+      <div id="fda-not-granted">
+        <span class="hint">Scanning external drives may hit hidden system folders (like <code>.Spotlight-V100</code>) that macOS blocks unless GODLister has Full Disk Access. GODLister will skip those folders and keep going, but granting access lets it read everything.</span>
+        <button id="open-fda-settings" class="secondary full">Open Full Disk Access Settings…</button>
+        <span class="hint">Add GODLister with the + button, enable its checkbox, then relaunch GODLister.</span>
+      </div>
+    </fieldset>
+
     <div class="actions">
       <button id="setup-cancel" class="secondary" hidden>Cancel</button>
       <button id="setup-save" class="primary">Save</button>
@@ -79,6 +89,7 @@
     </div>
 
     <div id="result-area" class="hint" hidden></div>
+    <button id="fda-nudge" class="secondary full" hidden>Open Full Disk Access Settings…</button>
   </section>
 
   <!-- Preview popup: shown instead of writing a file when preview mode is on -->
@@ -88,6 +99,7 @@
         <h1>Listing Preview</h1>
       </header>
       <p id="preview-counts" class="hint"></p>
+      <button id="preview-fda-nudge" class="secondary full" hidden>Open Full Disk Access Settings…</button>
       <pre id="preview-text"></pre>
       <div class="actions">
         <button id="preview-close" class="secondary">Close (discard)</button>

@@ -94,6 +94,29 @@ fn save_settings(
 // call from the main thread (they can deadlock the event loop), and Tauri
 // commands may run there. The oneshot channel just lets us await the
 // callback's result from an async command.
+// Opens macOS's Full Disk Access pane directly. External volumes' hidden
+// system folders (.Spotlight-V100, .fseventsd, .DocumentRevisions-V100, etc.)
+// are TCC-protected: reading them fails with EPERM ("Operation not
+// permitted") regardless of Unix file permissions, and the only fix is the
+// user granting this app Full Disk Access.
+#[tauri::command]
+fn open_full_disk_access_settings() -> Result<(), String> {
+    std::process::Command::new("open")
+        .arg("x-apple.systempreferences:com.apple.preference.security?Privacy_AllFiles")
+        .spawn()
+        .map_err(|e| e.to_string())?;
+    Ok(())
+}
+
+// The system TCC database is present on every Mac and is only openable by a
+// process that already has Full Disk Access - opening it (not just stat-ing
+// it) is the standard way apps probe their own FDA status without needing
+// to hit a real protected user folder first.
+#[tauri::command]
+fn check_full_disk_access() -> bool {
+    fs::File::open("/Library/Application Support/com.apple.TCC/TCC.db").is_ok()
+}
+
 #[tauri::command]
 async fn pick_scan_root(app: AppHandle) -> Option<String> {
     let (tx, rx) = tokio::sync::oneshot::channel();
@@ -273,14 +296,32 @@ fn collect_entries(
     god_matches: &mut u32,
     content_type_matches: &mut u32,
     dlc_matches: &mut u32,
+    unreadable_count: &mut u32,
+    full_disk_access_needed: &mut bool,
 ) -> Result<(), String> {
     let parent_name = dir
         .file_name()
         .map(|n| n.to_string_lossy().to_string())
         .unwrap_or_default();
 
-    let mut children: Vec<PathBuf> = fs::read_dir(dir)
-        .map_err(|e| format!("Couldn't read {}: {}", dir.display(), e))?
+    // A single unreadable folder (e.g. a TCC-protected .Spotlight-V100 on an
+    // external volume) shouldn't abort the whole scan - skip it, note it in
+    // the output, and keep going.
+    let read_dir = match fs::read_dir(dir) {
+        Ok(rd) => rd,
+        Err(e) => {
+            *unreadable_count += 1;
+            // EPERM (errno 1) is macOS's TCC/privacy-protection error, distinct
+            // from a plain Unix EACCES (13) permission error.
+            if e.raw_os_error() == Some(1) {
+                *full_disk_access_needed = true;
+            }
+            out.push((depth, format!("(couldn't read this folder: {})", e)));
+            return Ok(());
+        }
+    };
+
+    let mut children: Vec<PathBuf> = read_dir
         .filter_map(|entry| entry.ok())
         .map(|entry| entry.path())
         .collect();
@@ -321,6 +362,8 @@ fn collect_entries(
                 god_matches,
                 content_type_matches,
                 dlc_matches,
+                unreadable_count,
+                full_disk_access_needed,
             )?;
         }
     }
@@ -334,6 +377,8 @@ struct ListingSummary {
     god_matches: u32,
     content_type_matches: u32,
     dlc_matches: u32,
+    unreadable_count: u32,
+    full_disk_access_needed: bool,
     output_path: Option<String>,
     // Present only when output_path is None: the full listing text, for a
     // preview popup instead of a file write.
@@ -373,6 +418,8 @@ async fn generate_listing(
     let mut god_matches = 0u32;
     let mut content_type_matches = 0u32;
     let mut dlc_matches = 0u32;
+    let mut unreadable_count = 0u32;
+    let mut full_disk_access_needed = false;
     if max_depth != Some(0) {
         collect_entries(
             &root_path,
@@ -386,6 +433,8 @@ async fn generate_listing(
             &mut god_matches,
             &mut content_type_matches,
             &mut dlc_matches,
+            &mut unreadable_count,
+            &mut full_disk_access_needed,
         )?;
     }
 
@@ -409,6 +458,8 @@ async fn generate_listing(
                 god_matches,
                 content_type_matches,
                 dlc_matches,
+                unreadable_count,
+                full_disk_access_needed,
                 output_path: Some(path),
                 content: None,
             })
@@ -418,6 +469,8 @@ async fn generate_listing(
             god_matches,
             content_type_matches,
             dlc_matches,
+            unreadable_count,
+            full_disk_access_needed,
             output_path: None,
             content: Some(text),
         }),
@@ -438,7 +491,9 @@ fn main() {
             pick_scan_root,
             pick_output_path,
             generate_listing,
-            save_text
+            save_text,
+            open_full_disk_access_settings,
+            check_full_disk_access
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

@@ -35,6 +35,12 @@ function updateOutputFieldAvailability() {
   updateGenerateEnabled();
 }
 
+async function refreshFdaStatus() {
+  const granted = await invoke("check_full_disk_access");
+  el("fda-granted-msg").hidden = !granted;
+  el("fda-not-granted").hidden = granted;
+}
+
 async function openSetup(isFirstRun) {
   const s = await invoke("get_settings");
   el("setup-title").textContent = isFirstRun ? "Welcome to GODLister" : "Listing Settings";
@@ -54,6 +60,7 @@ async function openSetup(isFirstRun) {
   el("freq-once").checked = !s.ask_every_time;
 
   showView("setup-view");
+  refreshFdaStatus();
 }
 
 function updateContentTypeAvailability() {
@@ -96,6 +103,15 @@ async function init() {
   el("setup-cancel").addEventListener("click", () => showView("main-view"));
   el("open-settings").addEventListener("click", () => openSetup(false));
   el("god-recognition").addEventListener("change", updateContentTypeAvailability);
+  el("open-fda-settings").addEventListener("click", () => invoke("open_full_disk_access_settings"));
+  el("fda-nudge").addEventListener("click", () => invoke("open_full_disk_access_settings"));
+  el("preview-fda-nudge").addEventListener("click", () => invoke("open_full_disk_access_settings"));
+
+  window.addEventListener("focus", () => {
+    if (el("setup-view").classList.contains("active")) {
+      refreshFdaStatus();
+    }
+  });
 
   el("pick-root").addEventListener("click", async () => {
     const picked = await invoke("pick_scan_root");
@@ -150,6 +166,7 @@ async function runGenerate() {
   el("pick-root").disabled = true;
   el("pick-output").disabled = true;
   el("result-area").hidden = true;
+  el("fda-nudge").hidden = true;
 
   const resultArea = el("result-area");
   try {
@@ -158,14 +175,21 @@ async function runGenerate() {
       outputPath: previewMode ? null : state.outputPath,
     });
 
+    const fdaNote = summary.unreadable_count > 0
+      ? `\n${summary.unreadable_count} folder${summary.unreadable_count === 1 ? "" : "s"} couldn't be read and ${summary.unreadable_count === 1 ? "was" : "were"} skipped` +
+        (summary.full_disk_access_needed ? " — this usually means GODLister needs Full Disk Access." : ".")
+      : "";
+
     if (summary.content !== null && summary.content !== undefined) {
       state.previewContent = summary.content;
       el("preview-counts").textContent =
         `${summary.entries_written} entr${summary.entries_written === 1 ? "y" : "ies"}` +
         (summary.god_matches > 0 ? ` · ${summary.god_matches} GOD title${summary.god_matches === 1 ? "" : "s"}` : "") +
         (summary.content_type_matches > 0 ? ` · ${summary.content_type_matches} content-type match${summary.content_type_matches === 1 ? "" : "es"}` : "") +
-        (summary.dlc_matches > 0 ? ` · ${summary.dlc_matches} DLC name${summary.dlc_matches === 1 ? "" : "s"}` : "");
+        (summary.dlc_matches > 0 ? ` · ${summary.dlc_matches} DLC name${summary.dlc_matches === 1 ? "" : "s"}` : "") +
+        fdaNote;
       el("preview-text").textContent = summary.content;
+      el("preview-fda-nudge").hidden = !summary.full_disk_access_needed;
       el("preview-overlay").hidden = false;
     } else {
       resultArea.hidden = false;
@@ -174,7 +198,9 @@ async function runGenerate() {
         `Wrote ${summary.entries_written} entr${summary.entries_written === 1 ? "y" : "ies"} to ${summary.output_path}` +
         (summary.god_matches > 0 ? `\nLabeled ${summary.god_matches} GOD game folder${summary.god_matches === 1 ? "" : "s"} with their title.` : "") +
         (summary.content_type_matches > 0 ? `\nLabeled ${summary.content_type_matches} content-type folder${summary.content_type_matches === 1 ? "" : "s"}.` : "") +
-        (summary.dlc_matches > 0 ? `\nLabeled ${summary.dlc_matches} DLC file${summary.dlc_matches === 1 ? "" : "s"} with its name.` : "");
+        (summary.dlc_matches > 0 ? `\nLabeled ${summary.dlc_matches} DLC file${summary.dlc_matches === 1 ? "" : "s"} with its name.` : "") +
+        fdaNote;
+      el("fda-nudge").hidden = !summary.full_disk_access_needed;
     }
   } catch (err) {
     resultArea.hidden = false;

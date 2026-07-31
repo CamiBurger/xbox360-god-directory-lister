@@ -168,11 +168,11 @@ button.icon-button {
   white-space: pre-line;
 }
 
-#result-area.success {
+.success {
   color: var(--success);
 }
 
-#result-area.error {
+.error {
   color: var(--error);
 }
 
