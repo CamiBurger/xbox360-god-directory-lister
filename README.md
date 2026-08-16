@@ -1,4 +1,4 @@
-# GODLister
+# GOD Lister
 
 A small native macOS app that scans a folder and writes a depth-limited `.txt` directory listing, with optional Xbox 360 GOD-title and DLC recognition.
 

@@ -12,20 +12,20 @@ struct FDAStatusView: View {
         Group {
             if granted {
                 Label(
-                    "Full Disk Access is enabled — GODLister can read protected system folders on any drive.",
+                    "Full Disk Access is enabled — GOD Lister can read protected system folders on any drive.",
                     systemImage: "checkmark.circle.fill"
                 )
                 .font(.caption)
                 .foregroundStyle(.green)
             } else {
                 VStack(alignment: .leading, spacing: 6) {
-                    Text("Scanning external drives may hit hidden system folders (like .Spotlight-V100) that macOS blocks unless GODLister has Full Disk Access. GODLister will skip those folders and keep going, but granting access lets it read everything.")
+                    Text("Scanning external drives may hit hidden system folders (like .Spotlight-V100) that macOS blocks unless GOD Lister has Full Disk Access. GOD Lister will skip those folders and keep going, but granting access lets it read everything.")
                         .font(.caption)
                         .foregroundStyle(.secondary)
                     Button("Open Full Disk Access Settings…") {
                         FullDiskAccessChecker.openSettings()
                     }
-                    Text("Add GODLister with the + button, enable its checkbox, then relaunch GODLister.")
+                    Text("Add GOD Lister with the + button, enable its checkbox, then relaunch GOD Lister.")
                         .font(.caption)
                         .foregroundStyle(.secondary)
                 }

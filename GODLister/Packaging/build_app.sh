@@ -30,15 +30,15 @@ cat > "$APP_DIR/Contents/Info.plist" <<'EOF'
 <plist version="1.0">
 <dict>
     <key>CFBundleName</key>
-    <string>GODLister</string>
+    <string>GOD Lister</string>
     <key>CFBundleDisplayName</key>
-    <string>GODLister</string>
+    <string>GOD Lister</string>
     <key>CFBundleIdentifier</key>
     <string>com.camiburger.godlister</string>
     <key>CFBundleVersion</key>
-    <string>1.0</string>
+    <string>1.0.1</string>
     <key>CFBundleShortVersionString</key>
-    <string>1.0</string>
+    <string>1.0.1</string>
     <key>CFBundleExecutable</key>
     <string>GODLister</string>
     <key>CFBundleIconFile</key>

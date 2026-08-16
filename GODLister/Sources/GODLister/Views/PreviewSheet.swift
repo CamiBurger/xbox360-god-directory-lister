@@ -58,7 +58,7 @@ struct PreviewSheet: View {
         var text = parts.joined(separator: " · ")
         if summary.unreadableCount > 0 {
             text += "\n\(summary.unreadableCount) folder\(summary.unreadableCount == 1 ? "" : "s") couldn't be read and \(summary.unreadableCount == 1 ? "was" : "were") skipped" +
-                (summary.fullDiskAccessNeeded ? " — this usually means GODLister needs Full Disk Access." : ".")
+                (summary.fullDiskAccessNeeded ? " — this usually means GOD Lister needs Full Disk Access." : ".")
         }
         return text
     }

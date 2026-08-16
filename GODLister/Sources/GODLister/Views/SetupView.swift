@@ -21,7 +21,7 @@ struct SetupView: View {
     var body: some View {
         Form {
             Section {
-                Text(isFirstRun ? "Welcome to GODLister" : "Listing Settings")
+                Text(isFirstRun ? "Welcome to GOD Lister" : "Listing Settings")
                     .font(.title2.bold())
                 Text(isFirstRun
                     ? "Let's set your default options. You can change these again later from the settings button."

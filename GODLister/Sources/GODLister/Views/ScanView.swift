@@ -7,7 +7,7 @@ struct ScanView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
             HStack {
-                Text("GODLister").font(.title2.bold())
+                Text("GOD Lister").font(.title2.bold())
                 Spacer()
                 Button {
                     onOpenSettings()
@@ -94,7 +94,7 @@ struct ScanView: View {
     private func handle(_ summary: ListingSummary) {
         let fdaNote = summary.unreadableCount > 0
             ? "\n\(summary.unreadableCount) folder\(summary.unreadableCount == 1 ? "" : "s") couldn't be read and \(summary.unreadableCount == 1 ? "was" : "were") skipped" +
-              (summary.fullDiskAccessNeeded ? " — this usually means GODLister needs Full Disk Access." : ".")
+              (summary.fullDiskAccessNeeded ? " — this usually means GOD Lister needs Full Disk Access." : ".")
             : ""
 
         if let content = summary.content {
