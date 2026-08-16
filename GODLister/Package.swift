@@ -9,7 +9,8 @@ let package = Package(
             name: "GODLister",
             resources: [
                 .copy("Resources/gamelist_xbox360.csv"),
-                .copy("Resources/dlc_titles.csv")
+                .copy("Resources/dlc_titles.csv"),
+                .copy("Resources/dlc_titles_nointro.csv")
             ]
         ),
         .testTarget(

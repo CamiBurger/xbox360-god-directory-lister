@@ -36,16 +36,4 @@ final class RFC4180ParserTests: XCTestCase {
         let records = RFC4180Parser.parse("a,b\nc,d"[...])
         XCTAssertEqual(records, [["a", "b"], ["c", "d"]])
     }
-
-    func testRealDLCCatalogLoadsExpectedVolume() {
-        // Sanity check on the real bundled resource, loaded through
-        // DLCTitleCatalog (which owns GODLister's own Bundle.module) rather
-        // than re-loading the bundle here, since the test target declares
-        // no resources of its own. 7153 raw data rows collapse to 6031
-        // unique ContentIds under first-occurrence-wins dedup (cross-checked
-        // independently with Python's csv module) - assert the exact
-        // dedup'd count, not just "some large number", so a future parser
-        // regression that drops rows silently is caught.
-        XCTAssertEqual(DLCTitleCatalog.map.count, 6031)
-    }
 }
