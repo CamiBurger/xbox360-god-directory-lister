@@ -1,8 +1,15 @@
-# Rust build artifacts
-/src-tauri/target/
+# Swift/Xcode build artifacts
+GODLister/.build/
+GODLister/.swiftpm/
+DerivedData/
+xcuserdata/
 
-# Tauri-generated
-/src-tauri/gen/schemas/
+# Packaged app output (build it locally with GODLister/Packaging/build_app.sh)
+*.app
+
+# Rust build artifacts (legacy Tauri version)
+/legacy-tauri/src-tauri/target/
+/legacy-tauri/src-tauri/gen/schemas/
 
 # OS
 .DS_Store
