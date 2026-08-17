@@ -16,8 +16,12 @@ mkdir -p "$APP_DIR/Contents/MacOS" "$APP_DIR/Contents/Resources"
 
 BUILD_DIR="$PROJECT_DIR/.build/release"
 cp "$BUILD_DIR/GODLister" "$APP_DIR/Contents/MacOS/GODLister"
-cp "$BUILD_DIR/GODLister_GODLister.bundle/gamelist_xbox360.csv" "$APP_DIR/Contents/Resources/gamelist_xbox360.csv"
-cp "$BUILD_DIR/GODLister_GODLister.bundle/dlc_titles.csv" "$APP_DIR/Contents/Resources/dlc_titles.csv"
+# Copy every resource SwiftPM bundled, not a hardcoded filename list - a
+# named list here silently drops any new resource added to Package.swift,
+# which crashes the packaged app at runtime (Bundle.main lookup fails,
+# falls back to Bundle.module, which fatalErrors because there's no loose
+# bundle folder in a packaged .app).
+cp "$BUILD_DIR/GODLister_GODLister.bundle/"* "$APP_DIR/Contents/Resources/"
 cp "$PROJECT_DIR/Packaging/AppIcon.icns" "$APP_DIR/Contents/Resources/AppIcon.icns"
 
 cat > "$APP_DIR/Contents/PkgInfo" <<'EOF'
@@ -36,9 +40,9 @@ cat > "$APP_DIR/Contents/Info.plist" <<'EOF'
     <key>CFBundleIdentifier</key>
     <string>com.camiburger.godlister</string>
     <key>CFBundleVersion</key>
-    <string>1.1.0</string>
+    <string>1.1.1</string>
     <key>CFBundleShortVersionString</key>
-    <string>1.1.0</string>
+    <string>1.1.1</string>
     <key>CFBundleExecutable</key>
     <string>GODLister</string>
     <key>CFBundleIconFile</key>
